@@ -63,6 +63,7 @@ usage() {
   echo "  --nuclei-templates <dir>    Use custom nuclei templates"
 
   echo -e "\n${YELLOW}OTHER FLAGS:${RESET}"
+  echo "  --html-report               Generate HTML report (requires generate_html_report.sh)"
   echo "  -h, --help                  Show this help message"
   exit 0
 }
@@ -75,6 +76,7 @@ NO_NUCLEI=false
 WORDLIST="$(dirname "$0")/custom.txt"
 TEMPLATES="default"
 REMOVE_DUPLICATES=false
+HTML_REPORT=false
 
 # Arg parsing
 POSITIONAL=()
@@ -88,6 +90,7 @@ while [[ $# -gt 0 ]]; do
     --no-nuclei) NO_NUCLEI=true; shift ;;
     --nuclei-templates) TEMPLATES="$2"; shift 2 ;;
     --remove-duplicates) REMOVE_DUPLICATES=true; shift ;;
+    --html-report) GENERATE_HTML=true; shift ;;
     *) POSITIONAL+=("$1"); shift ;;
   esac
 done
@@ -217,6 +220,17 @@ wait
 [[ "$NO_FFUF" == false ]] && run_ffuf &
 [[ "$NO_NUCLEI" == false ]] && run_nuclei &
 wait
+
+# ─────────────────────────────
+# 📄 Generate HTML Report
+# ─────────────────────────────
+if [[ "$GENERATE_HTML" == true ]]; then
+  info "📄 Generating HTML report"
+  SCRIPT_DIR="$(dirname "$0")"
+  chmod +x "$SCRIPT_DIR/generate_html_report.sh"
+  bash "$SCRIPT_DIR/generate_html_report.sh" "$DIR"
+  info "📁 Report generated at: $DIR/report.html"
+fi
 
 info "🎉 Recon complete. Check the $DIR directory for results."
 exit 0
