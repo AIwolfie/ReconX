@@ -4,7 +4,8 @@
 # ⚙️  QuickRecon - Advanced Recon Script
 # Author: Mayank (AIwolfie)
 # Description: Enumerates subdomains, finds live hosts, bruteforces directories, and runs Nuclei scans with optional flags and parallelism.
-# Version: 1.0.0
+# Version: 1.0.4
+# Credits: Written by Mayank (AIwolfie)
 # ──────────────────────────────────────────────────────────────
 
 # Color codes
@@ -17,17 +18,17 @@ RESET="\033[0m"
 # Banner
 banner() {
   echo -e "${BLUE}"
-  echo"░▒▓███████▓▒░░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░" 
-  echo"░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░" 
-  echo"░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░" 
-  echo"░▒▓███████▓▒░░▒▓██████▓▒░░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░ "  
-  echo"░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░" 
-  echo"░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░" 
-  echo"░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░" 
+  echo "░▒▓███████▓▒░░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░"
+  echo "░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░"
+  echo "░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░"
+  echo "░▒▓███████▓▒░░▒▓██████▓▒░░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░"
+  echo "░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░"
+  echo "░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░     ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░"
+  echo "░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓██████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░"
   echo -e "${RESET}"
 }
 
-# Logging function
+# Logging functions
 log() {
   echo -e "[$(date +"%T")] $1"
 }
@@ -45,12 +46,17 @@ warning() {
   echo -e "${YELLOW}[WARN]${RESET} $1"
 }
 
+debug() {
+  echo -e "${BLUE}[DEBUG]${RESET} $1"
+}
+
 usage() {
   echo -e "\n${YELLOW}USAGE:${RESET} $0 <target_dir> <domain> [flags]"
   echo -e "\n${YELLOW}SUBDOMAIN ENUMERATION FLAGS:${RESET}"
   echo "  --only-subdomains           Run only subdomain enumeration"
   echo "  --add-subdomains <file>     Add subdomains from another file"
   echo "  --remove-duplicates         Keep only one subdomain per root domain"
+  echo "  --print-subdomains          Print subdomain list to console"
 
   echo -e "\n${YELLOW}LIVE HOST DETECTION:${RESET}"
   echo "  (Default: httpx-toolkit, outputs to <dir>/live_subdomains.txt)"
@@ -77,7 +83,8 @@ NO_NUCLEI=false
 WORDLIST="$(dirname "$0")/custom.txt"
 TEMPLATES="default"
 REMOVE_DUPLICATES=false
-HTML_REPORT=false
+GENERATE_HTML=false
+PRINT_SUBDOMAINS=false
 
 # Arg parsing
 POSITIONAL=()
@@ -92,6 +99,7 @@ while [[ $# -gt 0 ]]; do
     --nuclei-templates) TEMPLATES="$2"; shift 2 ;;
     --remove-duplicates) REMOVE_DUPLICATES=true; shift ;;
     --html-report) GENERATE_HTML=true; shift ;;
+    --print-subdomains) PRINT_SUBDOMAINS=true; shift ;;
     *) POSITIONAL+=("$1"); shift ;;
   esac
 done
@@ -127,21 +135,51 @@ end_timer() {
 sub_enum() {
   info "🚀 Enumerating subdomains"
   local t1=$(start_timer)
-  amass enum -d "$DOMAIN" -silent -o "$SUBDIR/amass.txt" &
-  subfinder -d "$DOMAIN" -silent -o "$SUBDIR/subfinder.txt" &
-  assetfinder --subs-only "$DOMAIN" > "$SUBDIR/assetfinder.txt" &
-  python3 crtsh.py -d "$DOMAIN" -o "$SUBDIR/crtsh.txt" >/dev/null 2>&1 &
+
+  # Run tools with timeout to prevent hanging
+  timeout 300 amass enum -d "$DOMAIN" -silent -o "$SUBDIR/amass.txt" && debug "Amass completed" || warning "Amass failed or timed out"
+  timeout 300 subfinder -d "$DOMAIN" -silent -o "$SUBDIR/subfinder.txt" && debug "Subfinder completed" || warning "Subfinder failed or timed out"
+  timeout 300 assetfinder --subs-only "$DOMAIN" > "$SUBDIR/assetfinder.txt" && debug "Assetfinder completed" || warning "Assetfinder failed or timed out"
+  timeout 300 python3 crtsh.py -d "$DOMAIN" -o "$SUBDIR/crtsh.txt" >/dev/null 2>&1 && debug "crtsh.py completed" || warning "crtsh.py failed or timed out"
   wait
 
-  cat "$SUBDIR"/*.txt > "$SUBDIR/temp_all.txt"
+  # Check if any output files were created
+  if [ ! -f "$SUBDIR/amass.txt" ] && [ ! -f "$SUBDIR/subfinder.txt" ] && [ ! -f "$SUBDIR/assetfinder.txt" ] && [ ! -f "$SUBDIR/crtsh.txt" ]; then
+    error "No subdomain files created. Check tool installation and network connectivity."
+  fi
+
+  # Count subdomains from each tool
+  AMASS_COUNT=$(wc -l < "$SUBDIR/amass.txt" 2>/dev/null || echo 0)
+  SUBFINDER_COUNT=$(wc -l < "$SUBDIR/subfinder.txt" 2>/dev/null || echo 0)
+  ASSETFINDER_COUNT=$(wc -l < "$SUBDIR/assetfinder.txt" 2>/dev/null || echo 0)
+  CRTSH_COUNT=$(wc -l < "$SUBDIR/crtsh.txt" 2>/dev/null || echo 0)
+  info "🔢 Subdomains gathered: Amass ($AMASS_COUNT), Subfinder ($SUBFINDER_COUNT), Assetfinder ($ASSETFINDER_COUNT), crtsh ($CRTSH_COUNT)"
+
+  # Combine results
+  : > "$SUBDIR/temp_all.txt" # Create empty file to avoid errors if no results
+  for file in "$SUBDIR/amass.txt" "$SUBDIR/subfinder.txt" "$SUBDIR/assetfinder.txt" "$SUBDIR/crtsh.txt"; do
+    [ -f "$file" ] && cat "$file" >> "$SUBDIR/temp_all.txt"
+  done
   if [[ -n "$ADD_FILE" && -f "$ADD_FILE" ]]; then
     cat "$ADD_FILE" >> "$SUBDIR/temp_all.txt"
   fi
+
+  # Check if temp_all.txt is empty
+  if [ ! -s "$SUBDIR/temp_all.txt" ]; then
+    error "No subdomains found. Check tool output and domain validity."
+  fi
+
   sort -u "$SUBDIR/temp_all.txt" > "$SUBDIR/all_subdomains.txt"
   rm "$SUBDIR/temp_all.txt"
 
   COUNT=$(wc -l < "$SUBDIR/all_subdomains.txt")
   info "✅ Total unique subdomains: $COUNT"
+
+  # Print subdomains if requested
+  if [[ "$PRINT_SUBDOMAINS" = true ]]; then
+    info "📜 Printing subdomain list:"
+    cat "$SUBDIR/all_subdomains.txt"
+  fi
 
   if [[ "$REMOVE_DUPLICATES" = true ]]; then
     info "🧹 Removing duplicate root domains"
@@ -233,5 +271,5 @@ if [[ "$GENERATE_HTML" == true ]]; then
   info "📁 Report generated at: $DIR/report.html"
 fi
 
-info "🎉 Recon complete. Check the $DIR directory for results."
+info "🎉 Recon complete. Check the $DIR directory for Mujeres
 exit 0
