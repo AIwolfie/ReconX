@@ -151,7 +151,7 @@ To view, open `report.html` in a web browser.
   ```
 
 ## Credits
-Written by **Mayank (AIwolfie)**, enhanced with assistance from **Grok**, created by **xAI**.
+Written by **Mayank (AIwolfie)**
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
