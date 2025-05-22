@@ -153,8 +153,5 @@ To view, open `report.html` in a web browser.
 ## Credits
 Written by **Mayank (AIwolfie)**
 
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
 ## Contributing
 Contributions are welcome! Please submit a pull request or open an issue on the repository.
